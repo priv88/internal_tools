@@ -1,6 +1,6 @@
 namespace :nasdaq_monthly do 
   desc "scrap the info from nasdaq on a monthly basis"
-  task :scraper => :environment do 
+  task :scraper_2 => :environment do 
     require 'rubygems'
     require 'nokogiri'
     require 'pp'
@@ -32,6 +32,11 @@ namespace :nasdaq_monthly do
     # month = [Time.now.strftime('%m')]
       month = [prior_month(Time.now)]
       year = [Time.now.strftime("%Y")]
+      
+
+      # year = ["2008"]
+      # month = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+
       # Reason for crawling list of recently filed IPOs: these are the companies with fresh, public financials; the finer categories "upcoming", "latest", and "recently withdrawn" can be identified within the company pages - this can be achieved by periodically refreshing the profile pages of <companies that have filed for IPOs>
 
       agent = Mechanize.new

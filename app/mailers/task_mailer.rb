@@ -7,11 +7,11 @@ class TaskMailer < ActionMailer::Base
     @receiver_name = 'Norval'
     type = type
 
-    if type = "filings"
-      file_name = "Nasdaq " + Time.now.strftime('%m-%d-%Y') + ".xls"
+    if type == "filings"
+      file_name = "Nasdaq Filings" + Time.now.strftime('%m-%d-%Y') + ".xls"
       file_path = "#{Rails.root}/Nasdaq_Filings.xls"
     else
-      file_name = "Nasdaq " + Time.now.strftime('%m-%d-%Y') + ".xls"
+      file_name = "Nasdaq Withdrawn" + Time.now.strftime('%m-%d-%Y') + ".xls"
       file_path = "#{Rails.root}/Nasdaq_Withdrawn.xls"
     end
 
