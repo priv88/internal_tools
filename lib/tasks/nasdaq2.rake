@@ -1,4 +1,10 @@
- require 'open-uri'
+namespace :nasdaq_monthly do 
+  desc "scrap the info from nasdaq on a monthly basis"
+  task :scraper => :environment do 
+    require 'rubygems'
+    require 'nokogiri'
+    require 'pp'
+    require 'open-uri'
     require 'writeexcel'
     require 'mechanize'
     require 'pry-byebug'
@@ -40,7 +46,7 @@
       year.each do |year|
         month.each do |month|
           # binding.pry
-          page = Nokogiri::HTML(open("http://www.nasdaq.com/markets/ipos/activity.aspx?tab=withdraw&month=#{year}-#{month}")).css('table')[2].css('tr').css('a') 
+          page = Nokogiri::HTML(open("http://www.nasdaq.com/markets/ipos/activity.aspx?tab=withdrawn&month=#{year}-#{month}")).css('table')[2].css('tr').css('a') 
           # page =  page.css('table')[2].css('tr').css('a')
           # links = ÷ 
           page.xpath("//a/@href").map(&:to_s).uniq.each do |link|
@@ -138,7 +144,6 @@
       type = "Withdrawn"
       TaskMailer.send_nasdaq_email(type).deliver!
       puts "hello"
-
     end
   end
 end
