@@ -23,15 +23,30 @@ namespace :nasdaq_monthly do
 
     def prior_month(time)
       month = time.strftime('%m').to_i
-      prior_month = month - 1
+      
+      if month = 01 
+        prior_month = 12
+      else
+        prior_month = month - 1
+      end
+      
       return prior_month.to_s
     end
+
+    def find_year(time)
+      year = time.now.strftime("%Y").to_i
+      month = time.now.strftime("$m").to_i
+      if month = 01
+        year = year - 1
+      end
+      return year.to_s
+    end 
 
     if Time.now.strftime('%d') == "01"
 
     # month = [Time.now.strftime('%m')]
-      month = [prior_month(Time.now)]
-      year = [Time.now.strftime("%Y")]
+      month = [12]
+      year = [2014]
       # Reason for crawling list of recently filed IPOs: these are the companies with fresh, public financials; the finer categories "upcoming", "latest", and "recently withdrawn" can be identified within the company pages - this can be achieved by periodically refreshing the profile pages of <companies that have filed for IPOs>
 
       agent = Mechanize.new
@@ -44,13 +59,16 @@ namespace :nasdaq_monthly do
       link1 = Array.new
 
       year.each do |year|
+        puts year
         month.each do |month|
+          puts month
           # binding.pry
           page = Nokogiri::HTML(open("http://www.nasdaq.com/markets/ipos/activity.aspx?tab=filings&month=#{year}-#{month}")).css('table')[2].css('tr').css('a') 
           # page =  page.css('table')[2].css('tr').css('a')
           # links = ÷ 
           page.xpath("//a/@href").map(&:to_s).uniq.each do |link|
             if link.to_s.match("http://www.nasdaq.com/markets/ipos/company")
+              puts link.to_s
               link1 << link.to_s
             else
               next
@@ -59,7 +77,7 @@ namespace :nasdaq_monthly do
         end
       end
 
-      workbook = WriteExcel.new('Nasdaq.xls')
+      workbook = WriteExcel.new('Nasdaq_Filings.xls')
       worksheet1 = workbook.add_worksheet
 
       count_1 = 0 
@@ -143,7 +161,7 @@ namespace :nasdaq_monthly do
       # binding.pry
       type = "filings"
       TaskMailer.send_nasdaq_email(type).deliver!
-      puts "hello"
+      puts "filings"
     end
   end
 end

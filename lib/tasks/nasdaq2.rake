@@ -23,15 +23,32 @@ namespace :nasdaq_monthly do
 
     def prior_month(time)
       month = time.strftime('%m').to_i
-      prior_month = month - 1
+      
+      if month = 01 
+        prior_month = 12
+      else
+        prior_month = month - 1
+      end
+      
       return prior_month.to_s
     end
+
+    def find_year(time)
+      year = time.now.strftime("%Y").to_i
+      month = time.now.strftime("$m").to_i
+      if month = 01
+        year = year - 1
+      end
+      return year.to_s
+    end 
+
+    puts Time.now.strftime('%d')
 
     if Time.now.strftime('%d') == "01"
 
     # month = [Time.now.strftime('%m')]
       month = [prior_month(Time.now)]
-      year = [Time.now.strftime("%Y")]
+      year = [find_year(Time.now)]
       
 
       # year = ["2008"]
@@ -54,8 +71,10 @@ namespace :nasdaq_monthly do
           page = Nokogiri::HTML(open("http://www.nasdaq.com/markets/ipos/activity.aspx?tab=withdrawn&month=#{year}-#{month}")).css('table')[2].css('tr').css('a') 
           # page =  page.css('table')[2].css('tr').css('a')
           # links = ÷ 
+          puts "page"
           page.xpath("//a/@href").map(&:to_s).uniq.each do |link|
             if link.to_s.match("http://www.nasdaq.com/markets/ipos/company")
+              puts link.to_s
               link1 << link.to_s
             else
               next
@@ -64,7 +83,7 @@ namespace :nasdaq_monthly do
         end
       end
 
-      workbook = WriteExcel.new('Nasdaq.xls')
+      workbook = WriteExcel.new('Nasdaq_Withdrawn.xls')
       worksheet1 = workbook.add_worksheet
 
       count_1 = 0 
@@ -148,7 +167,7 @@ namespace :nasdaq_monthly do
       # binding.pry
       type = "Withdrawn"
       TaskMailer.send_nasdaq_email(type).deliver!
-      puts "hello"
+      puts "Withdrawn"
     end
   end
 end
