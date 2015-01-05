@@ -141,10 +141,9 @@ namespace :nasdaq_monthly do
       end
       workbook.close
       # binding.pry
-      type = "Filings"
+      type = "filings"
       TaskMailer.send_nasdaq_email(type).deliver!
       puts "hello"
-
     end
   end
 end
