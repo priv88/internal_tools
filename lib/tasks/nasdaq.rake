@@ -21,10 +21,10 @@ namespace :nasdaq_monthly do
       end
     end
 
-    def prior_month(time)
+    def find_prior_month(time)
       month = time.strftime('%m').to_i
       
-      if month = 01 
+      if month == 1 
         prior_month = 12
       else
         prior_month = month - 1
@@ -34,19 +34,22 @@ namespace :nasdaq_monthly do
     end
 
     def find_year(time)
-      year = time.now.strftime("%Y").to_i
-      month = time.now.strftime("$m").to_i
-      if month = 01
+      year = time.strftime("%Y").to_i
+      month = time.strftime("%m").to_i
+      puts month
+      if month == 1
         year = year - 1
       end
       return year.to_s
     end 
 
+
     if Time.now.strftime('%d') == "01"
 
     # month = [Time.now.strftime('%m')]
-      month = [12]
-      year = [2014]
+      month = [prior_month(Time.now)]
+      year = [find_year(Time.now)]
+      
       # Reason for crawling list of recently filed IPOs: these are the companies with fresh, public financials; the finer categories "upcoming", "latest", and "recently withdrawn" can be identified within the company pages - this can be achieved by periodically refreshing the profile pages of <companies that have filed for IPOs>
 
       agent = Mechanize.new
@@ -79,6 +82,26 @@ namespace :nasdaq_monthly do
 
       workbook = WriteExcel.new('Nasdaq_Filings.xls')
       worksheet1 = workbook.add_worksheet
+
+      headers = ["Company Name", "Company Address", "Company Phone", "Company Website", "CEO", "Latest Employees", "State of Inc", "Fiscal Year End", "Status", "Proposed Symbol","Exchange","Share Price", "Shares Offered", "Offer Amount", "Total Expense", "Shares Over Alloted", "Shareholders Shares Offered", "Shares Outstanding", "Lockup Period (days", "Lockup Expiration", "Quiet Period Expiration", "CIK"]
+      worksheet2 = workbook.add_worksheet
+      headers.each_index do |index|
+        header = headers[index]
+        worksheet2.write(0,index,header)
+      end
+
+      summary_count = 1
+      link1.each do |url|
+        doc = Nokogiri::HTML(open(url))
+        company_name = doc.css("table")[2].css("td")[1].text
+        puts company_name
+        (0..21).each do |index|
+          worksheet2.write(summary_count,index,doc.css("table")[2].css("td")[index * 2 + 1].text)
+        end
+        summary_count += 1
+      end
+
+
 
       count_1 = 0 
 
@@ -152,7 +175,7 @@ namespace :nasdaq_monthly do
           dummycount+=1
         end
 
-        worksheet1.write_url(count_1,1,"internal:Sheet#{count_1+2}!A1")
+        worksheet1.write_url(count_1,1,"internal:Sheet#{count_1+3}!A1")
         count_1 +=1
         puts "@"
 

@@ -24,7 +24,7 @@ namespace :nasdaq_monthly do
     def prior_month(time)
       month = time.strftime('%m').to_i
       
-      if month = 01 
+      if month == 1 
         prior_month = 12
       else
         prior_month = month - 1
@@ -34,9 +34,10 @@ namespace :nasdaq_monthly do
     end
 
     def find_year(time)
-      year = time.now.strftime("%Y").to_i
-      month = time.now.strftime("$m").to_i
-      if month = 01
+      year = time.strftime("%Y").to_i
+      month = time.strftime("%m").to_i
+      puts month
+      if month == 1
         year = year - 1
       end
       return year.to_s
@@ -44,12 +45,14 @@ namespace :nasdaq_monthly do
 
     puts Time.now.strftime('%d')
 
-    if Time.now.strftime('%d') == "01"
+    if Time.now.strftime('%d') == "30"
 
     # month = [Time.now.strftime('%m')]
       month = [prior_month(Time.now)]
       year = [find_year(Time.now)]
       
+      puts month[0]
+      puts year[0]
 
       # year = ["2008"]
       # month = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
@@ -74,7 +77,6 @@ namespace :nasdaq_monthly do
           puts "page"
           page.xpath("//a/@href").map(&:to_s).uniq.each do |link|
             if link.to_s.match("http://www.nasdaq.com/markets/ipos/company")
-              puts link.to_s
               link1 << link.to_s
             else
               next
@@ -85,8 +87,26 @@ namespace :nasdaq_monthly do
 
       workbook = WriteExcel.new('Nasdaq_Withdrawn.xls')
       worksheet1 = workbook.add_worksheet
+      count_1 = 0
+       
+      
+      headers = ["Company Name", "Company Address", "Company Phone", "Company Website", "CEO", "Latest Employees", "State of Inc", "Fiscal Year End", "Status", "Proposed Symbol","Exchange","Share Price", "Shares Offered", "Offer Amount", "Total Expense", "Shares Over Alloted", "Shareholders Shares Offered", "Shares Outstanding", "Lockup Period (days", "Lockup Expiration", "Quiet Period Expiration", "CIK"]
+      worksheet2 = workbook.add_worksheet
+      headers.each_index do |index|
+        header = headers[index]
+        worksheet2.write(0,index,header)
+      end
 
-      count_1 = 0 
+      summary_count = 1
+      link1.each do |url|
+        doc = Nokogiri::HTML(open(url))
+        company_name = doc.css("table")[2].css("td")[1].text
+        puts company_name
+        (0..21).each do |index|
+          worksheet2.write(summary_count,index,doc.css("table")[2].css("td")[index * 2 + 1].text)
+        end
+        summary_count += 1
+      end
 
       link1.each do |url|
         doc = Nokogiri::HTML(open(url))
@@ -158,7 +178,7 @@ namespace :nasdaq_monthly do
           dummycount+=1
         end
 
-        worksheet1.write_url(count_1,1,"internal:Sheet#{count_1+2}!A1")
+        worksheet1.write_url(count_1,1,"internal:Sheet#{count_1+3}!A1")
         count_1 +=1
         puts "@"
 
