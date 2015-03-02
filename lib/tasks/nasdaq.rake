@@ -21,7 +21,7 @@ namespace :nasdaq_monthly do
       end
     end
 
-    def find_prior_month(time)
+    def prior_month(time)
       month = time.strftime('%m').to_i
       
       if month == 1 
@@ -32,6 +32,7 @@ namespace :nasdaq_monthly do
       
       return prior_month.to_s
     end
+
 
     def find_year(time)
       year = time.strftime("%Y").to_i
