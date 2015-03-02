@@ -45,7 +45,7 @@ namespace :nasdaq_monthly do
 
     puts Time.now.strftime('%d')
 
-    if Time.now.strftime('%d') == "30"
+    if Time.now.strftime('%d') == "01"
 
     # month = [Time.now.strftime('%m')]
       month = [prior_month(Time.now)]
