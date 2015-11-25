@@ -3,7 +3,7 @@ class TaskMailer < ActionMailer::Base
 
   def send_nasdaq_email(type)
     @receiver_email = 'amy.privco@gmail.com'
-    @receiver_email_2 = 'norval.privco@gmail.com'
+    #@receiver_email_2 = 'norval.privco@gmail.com'
     @receiver_name = 'Norval'
     type = type
 
